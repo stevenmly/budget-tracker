@@ -1,9 +1,11 @@
 let db;
-
+// establish a connection to IndexedDB database
 const request = indexedDB.open("budget_tracker", 1);
 
 request.onupgradeneeded = function (event) {
+	// save a reference to the database 
 	const db = event.target.result;
+	// create an object store (table) called `new_transaction`, set it to have an auto incrementing primary key of sorts
 	db.createObjectStore("new_transaction", { autoIncrement: true });
 };
 
@@ -11,7 +13,7 @@ request.onsuccess = function (event) {
 	db = event.target.result;
 
 	if (navigator.onLine) {
-		uploadBudget();
+		uploadTransaction();
 	}
 };
 
@@ -27,7 +29,7 @@ function saveRecord(record) {
 	transactionObjectStore.add(record);
 }
 
-function uploadBudget() {
+function uploadTransaction() {
 	const transaction = db.transaction(["new_transaction"], "readwrite");
 
 	const transactionObjectStore = transaction.objectStore("new_transaction");
@@ -53,9 +55,7 @@ function uploadBudget() {
 					}
 
 					const transaction = db.transaction(["new_transaction"], "readwrite");
-					const transactionObjectStore = transaction.objectStore(
-						"new_transaction"
-					);
+					const transactionObjectStore = transaction.objectStore("new_transaction");
 					transactionObjectStore.clear();
 				})
 				.catch((err) => {
@@ -67,4 +67,4 @@ function uploadBudget() {
 }
 
 // listen for app coming back online
-window.addEventListener("online", uploadBudget);
+window.addEventListener("online", uploadTransaction);
